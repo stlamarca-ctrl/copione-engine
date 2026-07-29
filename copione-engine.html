@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copione Engine</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Georgia', serif;
+    background: #0f0f0f;
+    color: #e8e2d5;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  header {
+    border-bottom: 1px solid #2a2a2a;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  header p {
+    font-size: 1.8rem;
+    font-weight: 400;
+    margin-top: 0.3rem;
+    color: #e8e2d5;
+    font-style: italic;
+  }
+
+  .controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .date-input-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .date-input-wrap label {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #666;
+  }
+
+  input[type="date"] {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #e8e2d5;
+    padding: 0.6rem 1rem;
+    font-family: 'Georgia', serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    outline: none;
+    border-radius: 2px;
+  }
+
+  input[type="date"]:focus { border-color: #555; }
+
+  .btn {
+    padding: 0.65rem 1.4rem;
+    font-family: 'Georgia', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border: 1px solid #333;
+    border-radius: 2px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: #e8e2d5;
+    color: #0f0f0f;
+    border-color: #e8e2d5;
+    align-self: flex-end;
+  }
+  .btn-primary:hover { background: #fff; border-color: #fff; }
+  .btn-primary:disabled { background: #333; color: #666; border-color: #333; cursor: not-allowed; }
+
+  .btn-secondary {
+    background: transparent;
+    color: #e8e2d5;
+    align-self: flex-end;
+  }
+  .btn-secondary:hover { background: #1a1a1a; border-color: #555; }
+  .btn-secondary:disabled { color: #444; border-color: #222; cursor: not-allowed; }
+
+  .btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    background: transparent;
+    color: #888;
+    border-color: #2a2a2a;
+    min-height: 44px;
+  }
+  .btn-small:hover:not(:disabled) { color: #e8e2d5; border-color: #555; }
+  .btn-small:disabled { color: #333; border-color: #1a1a1a; cursor: not-allowed; }
+
+  .btn-pdf {
+    background: #1a2a1a;
+    color: #6a9e6a;
+    border-color: #2a4a2a;
+  }
+  .btn-pdf:hover:not(:disabled) { background: #1f3a1f; color: #8abe8a; }
+
+  .status-bar {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 2px;
+    padding: 0.8rem 1rem;
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 1.5rem;
+    min-height: 2.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: sans-serif;
+  }
+
+  .status-bar.active { color: #b8a070; border-color: #3a2a10; background: #1a1500; }
+  .status-bar.ok    { color: #6a9e6a; border-color: #1a3a1a; background: #0a1a0a; }
+  .status-bar.err   { color: #9e5050; border-color: #3a1a1a; background: #1a0a0a; }
+
+  .spinner {
+    width: 12px; height: 12px;
+    border: 1.5px solid #555;
+    border-top-color: #b8a070;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .articles-section { margin-bottom: 2rem; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #1a1a1a;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .section-count { font-size: 0.75rem; color: #444; }
+
+  .article-card {
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 2px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: border-color 0.1s;
+  }
+  .article-card:hover { border-color: #2a2a2a; }
+  .article-card.pdf-loaded { border-color: #2a4a2a; }
+
+  .article-toggle {
+    width: 22px; height: 22px;
+    border: 1px solid #333;
+    border-radius: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.1s;
+  }
+  .article-toggle.checked { background: #e8e2d5; border-color: #e8e2d5; }
+  .article-toggle.checked::after { content: '✓'; font-size: 11px; color: #0f0f0f; }
+
+  .article-meta { flex: 1; min-width: 0; }
+
+  .article-source {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .article-title {
+    font-size: 0.95rem;
+    color: #c8c2b5;
+    line-height: 1.4;
+    margin-bottom: 0.3rem;
+  }
+
+  .article-snippet {
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.5;
+    font-family: sans-serif;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .pdf-badge {
+    font-size: 0.65rem;
+    background: #1a2a1a;
+    color: #6a9e6a;
+    border: 1px solid #2a4a2a;
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+  .pdf-badge.loading { color: #b8a070; background: #1a1500; border-color: #3a2a10; }
+
+  .output-section { margin-bottom: 2rem; }
+
+  .output-box {
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 2px;
+    padding: 1.5rem;
+  }
+
+  .output-box .question {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #d8d2c5;
+  }
+  .output-box .question:last-child { border-bottom: none; }
+
+  .question-num {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: #444;
+    margin-bottom: 0.2rem;
+    font-family: sans-serif;
+    text-transform: uppercase;
+  }
+
+  .output-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .drive-status {
+    font-size: 0.8rem;
+    color: #555;
+    font-family: sans-serif;
+    margin-left: auto;
+  }
+  .drive-status.saved { color: #6a9e6a; }
+  .drive-status.err   { color: #9e5050; }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #333;
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    font-family: sans-serif;
+  }
+  .tag-mail     { background: #1a1a2a; color: #6666aa; border: 1px solid #2a2a4a; }
+  .tag-rassegna { background: #1a2a1a; color: #6a9e6a; border: 1px solid #2a4a2a; }
+
+  .history-section { margin-top: 3rem; }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 0.85rem;
+    color: #555;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-date  { font-family: sans-serif; color: #444; width: 5.5rem; flex-shrink: 0; }
+  .history-title { flex: 1; color: #888; }
+  .history-link  { color: #6a9e6a; text-decoration: underline; cursor: pointer; font-size: 0.8rem; }
+  .history-link:hover { color: #aaa; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Copione Engine</h1>
+  <p>Raccolta e analisi della stampa</p>
+</header>
+
+<div class="controls">
+  <div class="date-input-wrap">
+    <label>Data di riferimento</label>
+    <input type="date" id="dateInput">
+  </div>
+  <button class="btn btn-primary" id="btnRaccolta" onclick="avviaRaccolta()">Raccogli articoli</button>
+  <button class="btn btn-secondary" id="btnCopione" onclick="avviaCopione()" disabled>Genera copione</button>
+</div>
+
+<div class="status-bar" id="statusBar">In attesa. Scegli una data e avvia la raccolta.</div>
+
+<div class="articles-section" id="articlesSection" style="display:none">
+  <div class="section-header">
+    <span class="section-label">Articoli raccolti</span>
+    <span class="section-count" id="articlesCount"></span>
+  </div>
+  <div id="articlesList"></div>
+  <div style="margin-top:0.8rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+    <button class="btn btn-small" onclick="selezionaTutti()">Seleziona tutti</button>
+    <button class="btn btn-small" onclick="deselezionaTutti()">Deseleziona tutti</button>
+    <button class="btn btn-small btn-pdf" id="btnLeggiPDF" onclick="leggiTuttiPDF()">Leggi PDF allegati</button>
+  </div>
+</div>
+
+<div class="output-section" id="outputSection" style="display:none">
+  <div class="section-header">
+    <span class="section-label">Copione generato</span>
+    <span id="copioneDate" class="section-count"></span>
+  </div>
+  <div class="output-box" id="outputBox"></div>
+  <div class="output-actions">
+    <button class="btn btn-small" onclick="copiaTesto()">Copia testo</button>
+    <button class="btn btn-small" id="btnSalvaDrive" onclick="salvasuDrive()">Salva su Drive</button>
+    <span class="drive-status" id="driveStatus"></span>
+  </div>
+</div>
+
+<div class="history-section">
+  <div class="section-header">
+    <span class="section-label">Archivio copioni</span>
+  </div>
+  <div id="historyList">
+    <div class="empty-state">Nessun copione salvato ancora.</div>
+  </div>
+</div>
+
+<script>
+const CLAUDE_MODEL = "claude-sonnet-4-6";
+const GMAIL_MCP = "https://gmailmcp.googleapis.com/mcp/v1";
+const DRIVE_MCP = "https://drivemcp.googleapis.com/mcp/v1";
+
+let articoliRaccolti = [];
+let ultimoCopione = "";
+let ultimaData = "";
+
+// Data di oggi come default
+const oggi = new Date().toISOString().split('T')[0];
+document.getElementById('dateInput').value = oggi;
+
+// ─── UTILITY ──────────────────────────────────────────────
+
+function setStatus(msg, type = '') {
+  const bar = document.getElementById('statusBar');
+  bar.className = 'status-bar' + (type ? ' ' + type : '');
+  bar.innerHTML = (type === 'active')
+    ? `<div class="spinner"></div> ${msg}`
+    : msg;
+}
+
+function callClaude(body) {
+  return fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  }).then(r => r.json());
+}
+
+function extractText(json) {
+  return (json.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+}
+
+function parseJSON(raw) {
+  const match = raw.match(/\[[\s\S]*\]|\{[\s\S]*\}/);
+  return match ? JSON.parse(match[0]) : JSON.parse(raw.replace(/```json|```/g, '').trim());
+}
+
+// ─── RACCOLTA MAIL ────────────────────────────────────────
+
+async function avviaRaccolta() {
+  const data = document.getElementById('dateInput').value;
+  if (!data) { setStatus('Seleziona una data.', 'err'); return; }
+
+  ultimaData = data;
+  const [anno, mese, giorno] = data.split('-');
+  const dataFmt = `${anno}/${mese}/${giorno}`;
+
+  // Calcolo giorno successivo senza dipendenza da timezone
+  const succDate = new Date(`${anno}-${mese}-${giorno}T12:00:00`);
+  succDate.setDate(succDate.getDate() + 1);
+  const sy = succDate.getFullYear();
+  const sm = String(succDate.getMonth() + 1).padStart(2, '0');
+  const sd = String(succDate.getDate()).padStart(2, '0');
+  const succFmt = `${sy}/${sm}/${sd}`;
+
+  document.getElementById('btnRaccolta').disabled = true;
+  document.getElementById('btnCopione').disabled = true;
+  setStatus(`Cerco le mail del ${giorno}/${mese}/${anno}...`, 'active');
+
+  try {
+    const query = `deliveredto:stlamarca+copione@gmail.com after:${dataFmt} before:${succFmt}`;
+
+    const json = await callClaude({
+      model: CLAUDE_MODEL,
+      max_tokens: 4000,
+      mcp_servers: [{ type: "url", url: GMAIL_MCP, name: "gmail" }],
+      messages: [{
+        role: "user",
+        content: `Cerca in Gmail le email con questa query: "${query}".
+Per ogni email trovata restituisci un JSON array con oggetti così:
+{ "id": "message_id", "subject": "oggetto", "sender": "mittente", "snippet": "snippet del body", "date": "data ISO", "hasAttachment": true/false, "attachmentId": "id primo allegato o null" }
+Per trovare attachmentId usa get_message sul singolo messaggio se necessario.
+Rispondi SOLO con il JSON array, nessun testo aggiuntivo, nessun markdown.`
+      }]
+    });
+
+    const rawText = extractText(json);
+    console.log('Raccolta raw:', rawText.substring(0, 800));
+
+    let articoli = [];
+    try { articoli = parseJSON(rawText); } catch(e) { console.error('Parse error:', e); }
+    if (!Array.isArray(articoli)) articoli = [];
+
+    articoliRaccolti = articoli.map(a => ({ ...a, selezionato: true, testoPDF: null }));
+
+    if (articoliRaccolti.length === 0) {
+      setStatus(`Nessuna mail trovata per il ${giorno}/${mese}/${anno}. Query: ${query}`, 'err');
+      document.getElementById('articlesSection').style.display = 'none';
+    } else {
+      renderArticoli();
+      const nPDF = articoliRaccolti.filter(a => a.hasAttachment || a.attachmentId).length;
+      setStatus(
+        `${articoliRaccolti.length} mail trovate${nPDF > 0 ? ` (${nPDF} con PDF allegato)` : ''}. Premi "Leggi PDF" per il testo completo, poi genera il copione.`,
+        'ok'
+      );
+      document.getElementById('btnCopione').disabled = false;
+    }
+
+  } catch(e) {
+    setStatus('Errore nella raccolta: ' + e.message, 'err');
+    console.error(e);
+  }
+
+  document.getElementById('btnRaccolta').disabled = false;
+}
+
+// ─── RENDER LISTA ARTICOLI ────────────────────────────────
+
+function renderArticoli() {
+  const section = document.getElementById('articlesSection');
+  const list = document.getElementById('articlesList');
+  document.getElementById('articlesCount').textContent = `${articoliRaccolti.length} elementi`;
+  section.style.display = 'block';
+
+  list.innerHTML = articoliRaccolti.map((a, i) => {
+    const isRassegna = a.sender && a.sender.includes('datastampa');
+    const mittente = a.sender ? a.sender.replace(/<.*>/, '').trim() : '';
+    const hasPDF = a.hasAttachment || a.attachmentId;
+    let pdfBadge = '';
+    if (hasPDF && !a.testoPDF) pdfBadge = '<span class="pdf-badge">PDF</span>';
+    if (hasPDF && a.testoPDF) pdfBadge = '<span class="pdf-badge">PDF ✓</span>';
+    return `
+    <div class="article-card${a.testoPDF ? ' pdf-loaded' : ''}" id="card-${i}">
+      <div class="article-toggle ${a.selezionato ? 'checked' : ''}" onclick="toggleArticolo(${i})" id="toggle-${i}"></div>
+      <div class="article-meta">
+        <div class="article-source">
+          <span class="tag ${isRassegna ? 'tag-rassegna' : 'tag-mail'}">${isRassegna ? 'Rassegna' : 'Mail'}</span>
+          ${mittente ? mittente : ''}
+          ${pdfBadge}
+        </div>
+        <div class="article-title">${a.subject || '(senza oggetto)'}</div>
+        ${a.testoPDF
+          ? `<div class="article-snippet">${a.testoPDF.substring(0, 200)}…</div>`
+          : (a.snippet ? `<div class="article-snippet">${a.snippet}</div>` : '')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleArticolo(i) {
+  articoliRaccolti[i].selezionato = !articoliRaccolti[i].selezionato;
+  document.getElementById(`toggle-${i}`).classList.toggle('checked', articoliRaccolti[i].selezionato);
+}
+
+function selezionaTutti()   { articoliRaccolti.forEach((a,i) => { a.selezionato = true;  document.getElementById(`toggle-${i}`).classList.add('checked'); }); }
+function deselezionaTutti() { articoliRaccolti.forEach((a,i) => { a.selezionato = false; document.getElementById(`toggle-${i}`).classList.remove('checked'); }); }
+
+// ─── LETTURA PDF ──────────────────────────────────────────
+
+async function leggiTuttiPDF() {
+  const conPDF = articoliRaccolti.filter((a,i) => (a.hasAttachment || a.attachmentId) && !a.testoPDF);
+  if (conPDF.length === 0) {
+    setStatus('Nessun PDF da leggere (già tutti letti o nessun allegato).', 'ok');
+    return;
+  }
+
+  document.getElementById('btnLeggiPDF').disabled = true;
+  document.getElementById('btnRaccolta').disabled = true;
+
+  for (let i = 0; i < articoliRaccolti.length; i++) {
+    const a = articoliRaccolti[i];
+    if (!(a.hasAttachment || a.attachmentId) || a.testoPDF) continue;
+
+    // Badge loading
+    const card = document.getElementById(`card-${i}`);
+    if (card) {
+      const badge = card.querySelector('.pdf-badge');
+      if (badge) { badge.textContent = 'PDF…'; badge.classList.add('loading'); }
+    }
+
+    setStatus(`Leggo PDF allegato ${i+1}/${articoliRaccolti.length}: ${a.subject}…`, 'active');
+
+    try {
+      const json = await callClaude({
+        model: CLAUDE_MODEL,
+        max_tokens: 4000,
+        mcp_servers: [{ type: "url", url: GMAIL_MCP, name: "gmail" }],
+        messages: [{
+          role: "user",
+          content: `Scarica e leggi il contenuto testuale del PDF allegato al messaggio Gmail con id "${a.id}".
+Restituisci SOLO il testo estratto dal PDF, senza commenti, senza markdown.
+Se non riesci a leggere il PDF, scrivi "ERRORE_PDF".`
+        }]
+      });
+
+      const testo = extractText(json).trim();
+      if (testo && !testo.startsWith('ERRORE_PDF') && testo.length > 50) {
+        articoliRaccolti[i].testoPDF = testo;
+      }
+    } catch(e) {
+      console.error(`Errore PDF mail ${a.id}:`, e);
+    }
+
+    renderArticoli();
+  }
+
+  const letti = articoliRaccolti.filter(a => a.testoPDF).length;
+  setStatus(`PDF letti: ${letti}. Ora genera il copione con il testo completo degli articoli.`, 'ok');
+  document.getElementById('btnLeggiPDF').disabled = false;
+  document.getElementById('btnRaccolta').disabled = false;
+}
+
+// ─── GENERAZIONE COPIONE ──────────────────────────────────
+
+async function avviaCopione() {
+  const selezionati = articoliRaccolti.filter(a => a.selezionato);
+  if (selezionati.length === 0) { setStatus('Seleziona almeno un articolo.', 'err'); return; }
+
+  document.getElementById('btnCopione').disabled = true;
+  document.getElementById('btnRaccolta').disabled = true;
+  setStatus('Genero il copione…', 'active');
+
+  // Usa il testo PDF se disponibile, altrimenti snippet
+  const contenuto = selezionati.map(a => {
+    const testo = a.testoPDF
+      ? `TESTO COMPLETO:\n${a.testoPDF.substring(0, 3000)}`
+      : `SNIPPET: ${a.snippet || ''}`;
+    return `FONTE: ${a.sender || 'n.d.'}\nOGGETTO: ${a.subject || ''}\n${testo}`;
+  }).join('\n\n---\n\n');
+
+  try {
+    const json = await callClaude({
+      model: CLAUDE_MODEL,
+      max_tokens: 2000,
+      messages: [{
+        role: "user",
+        content: `Sei un giornalista esperto in politica e cronaca italiana con 40 anni di esperienza.
+
+Dai seguenti articoli genera 20 domande per un'intervista a un politico italiano (parlamentare o giornalista di area politica).
+Organizzale in DUE BLOCCHI da 10 domande ciascuno.
+I due blocchi possono trattare lo stesso argomento o argomenti diversi, a seconda di quello che emerge dagli articoli.
+Linguaggio diretto, semplice ma non banale. Domande secche, niente preamboli.
+
+Formato risposta: JSON con questa struttura:
+{
+  "blocco1": { "tema": "titolo tema", "domande": [{"n":1,"tipo":"cronaca|politica","domanda":"..."},...] },
+  "blocco2": { "tema": "titolo tema", "domande": [{"n":1,"tipo":"cronaca|politica","domanda":"..."},...] }
+}
+
+In ogni blocco: 2 domande di cronaca e 8 di politica.
+Rispondi SOLO con il JSON, nessun testo aggiuntivo.
+
+ARTICOLI:
+${contenuto}`
+      }]
+    });
+
+    const rawText = extractText(json);
+    console.log('Copione raw:', rawText.substring(0, 500));
+
+    let dati = null;
+    try { dati = parseJSON(rawText); } catch(e) { console.error('Parse copione:', e); }
+
+    if (!dati || !dati.blocco1 || !dati.blocco2) {
+      setStatus('Errore nella generazione del copione. Riprova.', 'err');
+    } else {
+      renderCopione(dati);
+      setStatus('Copione pronto. Salvalo su Drive.', 'ok');
+    }
+
+  } catch(e) {
+    setStatus('Errore: ' + e.message, 'err');
+    console.error(e);
+  }
+
+  document.getElementById('btnCopione').disabled = false;
+  document.getElementById('btnRaccolta').disabled = false;
+}
+
+// ─── RENDER COPIONE ───────────────────────────────────────
+
+function renderCopione(dati) {
+  const section = document.getElementById('outputSection');
+  const box = document.getElementById('outputBox');
+  const [anno, mese, giorno] = ultimaData.split('-');
+  document.getElementById('copioneDate').textContent = `${giorno}/${mese}/${anno}`;
+
+  // Costruisce testo piatto per copia/Drive
+  ultimoCopione =
+    `COPIONE — ${giorno}/${mese}/${anno}\n\n` +
+    `BLOCCO 1 — ${dati.blocco1.tema}\n\n` +
+    dati.blocco1.domande.map(d => `${d.n}. [${d.tipo}] ${d.domanda}`).join('\n\n') +
+    `\n\n---\n\nBLOCCO 2 — ${dati.blocco2.tema}\n\n` +
+    dati.blocco2.domande.map(d => `${d.n}. [${d.tipo}] ${d.domanda}`).join('\n\n');
+
+  const renderBlocco = (b, num) => `
+    <div style="margin-bottom:1.5rem;">
+      <div style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:#555;margin-bottom:1rem;padding-bottom:0.4rem;border-bottom:1px solid #222;">
+        Blocco ${num} &mdash; ${b.tema}
+      </div>
+      ${b.domande.map(d => `
+        <div class="question">
+          <div class="question-num">${d.n} &middot; ${d.tipo}</div>
+          ${d.domanda}
+        </div>`).join('')}
+    </div>`;
+
+  box.innerHTML = renderBlocco(dati.blocco1, 1) + renderBlocco(dati.blocco2, 2);
+  section.style.display = 'block';
+  document.getElementById('driveStatus').textContent = '';
+  document.getElementById('driveStatus').className = 'drive-status';
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── COPIA TESTO ──────────────────────────────────────────
+
+function copiaTesto() {
+  if (!ultimoCopione) return;
+  navigator.clipboard.writeText(ultimoCopione).then(() => {
+    setStatus('Testo copiato negli appunti.', 'ok');
+  }).catch(() => {
+    // Fallback per browser che non supportano clipboard API
+    const ta = document.createElement('textarea');
+    ta.value = ultimoCopione;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    setStatus('Testo copiato.', 'ok');
+  });
+}
+
+// ─── SALVATAGGIO DRIVE ────────────────────────────────────
+
+async function salvasuDrive() {
+  if (!ultimoCopione) return;
+  const btn = document.getElementById('btnSalvaDrive');
+  const statusEl = document.getElementById('driveStatus');
+  btn.disabled = true;
+  statusEl.textContent = 'Salvataggio in corso…';
+  statusEl.className = 'drive-status';
+
+  const [anno, mese, giorno] = ultimaData.split('-');
+  const nomeFile = `Copione_${giorno}-${mese}-${anno}`;
+
+  try {
+    // Usa create_file di Google Drive via MCP per creare un Google Doc
+    const json = await callClaude({
+      model: CLAUDE_MODEL,
+      max_tokens: 1000,
+      mcp_servers: [{ type: "url", url: DRIVE_MCP, name: "drive" }],
+      messages: [{
+        role: "user",
+        content: `Crea un nuovo file Google Docs su Google Drive con:
+- Nome: "${nomeFile}"
+- Contenuto: il testo che segue, copiato esattamente
+
+${ultimoCopione}
+
+Dopo la creazione restituisci SOLO l'URL del file nel formato: https://docs.google.com/document/d/FILE_ID/edit`
+      }]
+    });
+
+    const risposta = extractText(json);
+    console.log('Drive response:', risposta);
+
+    // Cerca l'URL nella risposta
+    const urlMatch = risposta.match(/https:\/\/docs\.google\.com\/document\/d\/[^\s\)"]+/);
+    const driveUrl = urlMatch ? urlMatch[0] : null;
+
+    if (driveUrl) {
+      statusEl.textContent = 'Salvato su Drive ✓';
+      statusEl.className = 'drive-status saved';
+      aggiungiStorico(giorno, mese, anno, driveUrl);
+    } else {
+      // File probabilmente creato ma URL non estratto — cerca comunque
+      statusEl.textContent = 'Salvato (verifica Drive)';
+      statusEl.className = 'drive-status saved';
+      aggiungiStorico(giorno, mese, anno, null);
+    }
+
+  } catch(e) {
+    console.error('Drive error:', e);
+    statusEl.textContent = 'Errore salvataggio: ' + e.message;
+    statusEl.className = 'drive-status err';
+  }
+
+  btn.disabled = false;
+}
+
+// ─── ARCHIVIO ─────────────────────────────────────────────
+
+function aggiungiStorico(g, m, a, url) {
+  const list = document.getElementById('historyList');
+  const empty = list.querySelector('.empty-state');
+  if (empty) empty.remove();
+
+  const nFonti = articoliRaccolti.filter(x => x.selezionato).length;
+  const item = document.createElement('div');
+  item.className = 'history-item';
+  item.innerHTML = `
+    <span class="history-date">${g}/${m}/${a}</span>
+    <span class="history-title">Copione — ${nFonti} fonti</span>
+    ${url
+      ? `<a class="history-link" href="${url}" target="_blank">Apri su Drive</a>`
+      : `<span style="color:#333;font-size:0.8rem;">Salvato</span>`}
+  `;
+  list.insertBefore(item, list.firstChild);
+}
+</script>
+</body>
+</html>
