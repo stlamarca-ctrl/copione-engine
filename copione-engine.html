@@ -400,7 +400,10 @@ function setStatus(msg, type = '') {
 function callClaude(body) {
   return fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
     body: JSON.stringify(body)
   }).then(r => r.json());
 }
