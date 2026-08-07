@@ -96,3 +96,27 @@ Ultimo collaudo live: 1 mail, 1 PDF, 1 Markdown, 0 errori, circa 17 secondi.
 - Non cancellare il vecchio HTML: conservarlo in `legacy`.
 - Non pubblicare mai la chiave `PORTAL_BYPASS_TOKEN`.
 - Non spostare i PDF su GitHub: restano nell'archivio R2 del portale.
+
+## Completamento del 7 agosto 2026
+
+- Creato il worktree isolato `outputs/copione-mobile-github` basato su
+  `github/main`.
+- Creato il ramo `agent/portale-mobile-multidevice`.
+- Conservato il vecchio file come `legacy/copione-engine.html`.
+- Importati portale, documentazione, Apps Script ed estensione senza
+  credenziali o documenti dell'archivio.
+- Build vinext completata con successo fuori dal limite Windows della sandbox.
+- Test del portale: 2 superati, 0 falliti.
+- Commit creato: `0e3e1f8 Porta Copione Engine su GitHub`.
+- Ramo pubblicato sul remoto `github` senza force push.
+- Pull request in bozza aperta e verificata come unibile:
+  https://github.com/stlamarca-ctrl/copione-engine/pull/1
+
+## NUOVO FERMO ESATTO — RIPARTIRE DA QUI
+
+1. Aprire e controllare la pull request in bozza numero 1.
+2. Se il contenuto è approvato, trasformarla in pronta o unirla in `main`.
+3. Dopo il merge, verificare che `main` contenga il portale e la cartella
+   `legacy`.
+4. Collegare `stlamarca-ctrl/copione-engine` a Codex Cloud.
+5. Non trasferire in GitHub token, PDF o materiali dell'archivio R2.
