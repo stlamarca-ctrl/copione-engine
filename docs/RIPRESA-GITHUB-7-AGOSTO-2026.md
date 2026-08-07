@@ -1,3 +1,4 @@
+
 # RIPRESA GITHUB — 7 AGOSTO 2026
 
 ## Decisione confermata dall'utente
@@ -111,12 +112,28 @@ Ultimo collaudo live: 1 mail, 1 PDF, 1 Markdown, 0 errori, circa 17 secondi.
 - Ramo pubblicato sul remoto `github` senza force push.
 - Pull request in bozza aperta e verificata come unibile:
   https://github.com/stlamarca-ctrl/copione-engine/pull/1
+- Pull request numero 1 resa pronta e unita in `main` il 7 agosto 2026.
+- Commit di unione: `1aff498d55eed37b27ff360d490ac1fd2396aa08`.
+- Il ramo di sicurezza `agent/portale-mobile-multidevice` è stato conservato.
+- Installato il connettore ChatGPT Codex su GitHub con accesso limitato al solo
+  repository `stlamarca-ctrl/copione-engine`.
+- Verificata in Codex Cloud la disponibilità del repository e del ramo `main`.
+- Creato automaticamente l'ambiente Codex Cloud `copione-engine`.
+- Primo collaudo cloud in sola lettura completato con esito
+  `COLLAUDO SUPERATO` sul commit di `main`
+  `1aff498d55eed37b27ff360d490ac1fd2396aa08`.
+- Confermata la presenza di portale, `README.md`, `docs/`, `integrations/`,
+  `legacy/` e `legacy/copione-engine.html`.
+- Confermata l'assenza di token, credenziali, PDF e materiali dell'archivio R2
+  tra i file tracciati. Worktree rimasto pulito; nessun commit o pull request
+  creati dal collaudo.
 
 ## NUOVO FERMO ESATTO — RIPARTIRE DA QUI
 
-1. Aprire e controllare la pull request in bozza numero 1.
-2. Se il contenuto è approvato, trasformarla in pronta o unirla in `main`.
-3. Dopo il merge, verificare che `main` contenga il portale e la cartella
-   `legacy`.
-4. Collegare `stlamarca-ctrl/copione-engine` a Codex Cloud.
-5. Non trasferire in GitHub token, PDF o materiali dell'archivio R2.
+1. Non ripetere importazione, build, test, push, merge o collegamento GitHub:
+   sono completati.
+2. Il primo collaudo Codex Cloud è completato: non ripeterlo senza necessità.
+3. Proseguire con la prossima modifica funzionale richiesta dall'utente,
+   lavorando dal repository GitHub tramite Codex Cloud quando opportuno.
+4. Non trasferire in GitHub token, PDF o materiali dell'archivio R2.
+
