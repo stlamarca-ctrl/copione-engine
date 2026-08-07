@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Copione - Raccoglitore</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">COPIONE ENGINE</p>
+        <h1>Raccoglitore</h1>
+      </header>
+
+      <label for="collectionDate">Data della raccolta</label>
+      <input id="collectionDate" type="date" required>
+
+      <section>
+        <h2>Articolo online</h2>
+        <p>Salva la pagina aperta come Markdown nella cartella <code>web</code>.</p>
+        <button id="saveArticle" class="primary">Salva articolo aperto</button>
+      </section>
+
+      <section>
+        <h2>PDF da Gmail</h2>
+        <p>Per 10 minuti tutti i PDF scaricati finiranno nella cartella <code>pdf</code> della data scelta.</p>
+        <button id="startPdf">Attiva raccolta PDF</button>
+        <button id="stopPdf" class="quiet">Ferma raccolta PDF</button>
+      </section>
+
+      <section class="summary">
+        <span id="counter">0 elementi registrati</span>
+        <button id="exportManifest" class="quiet">Esporta manifest.json</button>
+      </section>
+
+      <button id="openArchive" class="archive">Apri archivio</button>
+
+      <p id="status" role="status" aria-live="polite"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
