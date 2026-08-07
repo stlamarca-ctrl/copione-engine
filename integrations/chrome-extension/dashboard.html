@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Archivio - Copione Engine</title>
+    <link rel="stylesheet" href="dashboard.css">
+  </head>
+  <body>
+    <header class="hero">
+      <div>
+        <p class="eyebrow">01 · COPIONE ENGINE</p>
+        <h1>Archivio rassegne</h1>
+        <p class="subtitle">Consistenza dei materiali raccolti per data.</p>
+      </div>
+      <button id="refresh">Aggiorna</button>
+    </header>
+
+    <main>
+      <section id="totals" class="totals" aria-label="Riepilogo archivio"></section>
+      <p id="status" role="status" aria-live="polite"></p>
+      <section id="commandPanel" class="command-panel" hidden>
+        <div>
+          <p class="command-title">Comando per Codex</p>
+          <p class="command-help">Il comando è stato copiato. Apri Codex, incollalo e invialo.</p>
+        </div>
+        <textarea id="commandText" readonly></textarea>
+        <button id="copyAgain">Copia di nuovo</button>
+      </section>
+      <div id="archive"></div>
+    </main>
+
+    <template id="dayTemplate">
+      <article class="day-card">
+        <header class="day-header">
+          <div>
+            <p class="date"></p>
+            <p class="counts"></p>
+          </div>
+          <div class="actions">
+            <button class="copy-command">Crea copione</button>
+            <button class="toggle" aria-expanded="false">Mostra file</button>
+          </div>
+        </header>
+        <div class="details" hidden>
+          <div class="file-list"></div>
+        </div>
+      </article>
+    </template>
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>

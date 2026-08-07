@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "01 - Copione - Raccoglitore rassegna",
+  "version": "1.3.0",
+  "description": "Archivia PDF e articoli web in raccolte giornaliere per Copione Engine.",
+  "permissions": [
+    "activeTab",
+    "clipboardWrite",
+    "downloads",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Raccogli per Copione",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html"
+}
